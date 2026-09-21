@@ -27,14 +27,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
   const { user, role, isAdmin, signOut, switchRole } = useAuth();
   const navigate = useNavigate();
 
-  const navItems = [
+  const mainNavItems = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/clients', label: 'Clients', icon: Users },
     { to: '/subscriptions', label: 'Licenses & Renewals', icon: CreditCard },
-    { to: '/payments', label: 'Payments & Receipts', icon: Receipt },
     { to: '/proposals', label: 'Quotations', icon: FileText },
-    { to: '/tickets', label: 'Support Tickets', icon: Headphones },
+  ];
+
+  const opsNavItems = [
+    { to: '/payments', label: 'Payments & Receipts', icon: Receipt },
     { to: '/products', label: 'Products & Plans', icon: Package },
+    { to: '/tickets', label: 'Support Tickets', icon: Headphones },
     { to: '/reports', label: 'Reports & Analytics', icon: BarChart3 },
     { to: '/settings', label: 'Settings', icon: Settings },
   ];
@@ -67,32 +70,70 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              id={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
-              onClick={onCloseMobile}
-              className={({ isActive }) =>
-                `relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-colors duration-150 ${
-                  isActive
-                    ? 'text-[#5B5CE2] bg-[#EEF0FF]'
-                    : 'text-[#687080] hover:text-[#171A21] hover:bg-[#F7F8FA]'
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#5B5CE2]' : 'text-[#8D95A5]'}`} />
-                  <span>{item.label}</span>
-                </>
-              )}
-            </NavLink>
-          );
-        })}
+      <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
+        {/* Main Workspace Section */}
+        <div className="space-y-1">
+          <span className="px-3.5 text-[10px] font-bold uppercase tracking-wider text-[#9AA2B1] block mb-1.5">
+            Main Workspace
+          </span>
+          {mainNavItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                id={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                onClick={onCloseMobile}
+                className={({ isActive }) =>
+                  `relative flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors duration-150 ${
+                    isActive
+                      ? 'text-[#5B5CE2] bg-[#EEF0FF]'
+                      : 'text-[#687080] hover:text-[#171A21] hover:bg-[#F7F8FA]'
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#5B5CE2]' : 'text-[#8D95A5]'}`} />
+                    <span>{item.label}</span>
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
+        </div>
+
+        {/* Business Operations Section */}
+        <div className="space-y-1 pt-2 border-t border-[#F0F2F5]">
+          <span className="px-3.5 text-[10px] font-bold uppercase tracking-wider text-[#9AA2B1] block mb-1.5">
+            Business Operations
+          </span>
+          {opsNavItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                id={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                onClick={onCloseMobile}
+                className={({ isActive }) =>
+                  `relative flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors duration-150 ${
+                    isActive
+                      ? 'text-[#5B5CE2] bg-[#EEF0FF]'
+                      : 'text-[#687080] hover:text-[#171A21] hover:bg-[#F7F8FA]'
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#5B5CE2]' : 'text-[#8D95A5]'}`} />
+                    <span>{item.label}</span>
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
+        </div>
       </nav>
 
       {/* User Profile Footer */}

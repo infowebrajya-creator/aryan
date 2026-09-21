@@ -167,7 +167,7 @@ export const DashboardPage: React.FC = () => {
             Upcoming Renewals
           </h2>
           <button
-            onClick={() => navigate('/renewals')}
+            onClick={() => navigate('/subscriptions')}
             className="btn-tertiary text-xs"
           >
             View All ({expiringSoonSubscriptions.length})

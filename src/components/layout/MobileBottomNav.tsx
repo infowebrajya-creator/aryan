@@ -5,8 +5,8 @@ import {
   LayoutDashboard,
   Users,
   CreditCard,
-  RefreshCw,
-  Receipt,
+  FileText,
+  Settings,
   Search,
 } from 'lucide-react';
 
@@ -18,9 +18,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onOpenSearch }
   const items = [
     { to: '/dashboard', label: 'Home', icon: LayoutDashboard },
     { to: '/clients', label: 'Clients', icon: Users },
-    { to: '/subscriptions', label: 'Subs', icon: CreditCard },
-    { to: '/renewals', label: 'Renewals', icon: RefreshCw },
-    { to: '/payments', label: 'Payments', icon: Receipt },
+    { to: '/subscriptions', label: 'Licenses', icon: CreditCard },
+    { to: '/proposals', label: 'Quotes', icon: FileText },
+    { to: '/settings', label: 'Settings', icon: Settings },
   ];
 
   return (

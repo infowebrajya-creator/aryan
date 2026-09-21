@@ -1256,9 +1256,17 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     addToast('All demo and sample data wiped. Ready for production.', 'success');
   };
 
+  // Safe UUID generator helper
+  const generateUUID = (prefix: string = 'id') => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    return prefix + Math.random().toString(36).substring(2, 14) + Date.now().toString(36);
+  };
+
   // Proposal Actions
   const addProposal = async (proposalData: Omit<Proposal, 'id' | 'created_at' | 'updated_at' | 'proposal_number'>): Promise<Proposal> => {
-    const id = crypto.randomUUID();
+    const id = generateUUID('prop');
     const proposal_number = `WR-PROP-${String(proposals.length + 1).padStart(4, '0')}`;
     const now = new Date().toISOString();
     const newProposal: Proposal = {
@@ -1327,7 +1335,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Support Ticket Actions
   const addSupportTicket = async (ticketData: Omit<SupportTicket, 'id' | 'ticket_number' | 'created_at' | 'updated_at' | 'status'>): Promise<SupportTicket> => {
-    const id = crypto.randomUUID();
+    const id = generateUUID('tkt');
     const ticket_number = `WR-TKT-${String(tickets.length + 1).padStart(4, '0')}`;
     const now = new Date().toISOString();
     const newTicket: SupportTicket = {
@@ -1367,7 +1375,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Client Documents Actions
   const addClientDocument = async (docData: Omit<ClientDocument, 'id' | 'uploaded_at'>): Promise<ClientDocument> => {
-    const id = crypto.randomUUID();
+    const id = generateUUID('doc');
     const newDoc: ClientDocument = {
       ...docData,
       id,

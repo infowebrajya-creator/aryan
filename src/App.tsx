@@ -13,12 +13,10 @@ import { ClientsPage } from './pages/ClientsPage';
 import { ClientDetailPage } from './pages/ClientDetailPage';
 import { SubscriptionsPage } from './pages/SubscriptionsPage';
 import { PaymentsPage } from './pages/PaymentsPage';
-import { RenewalsPage } from './pages/RenewalsPage';
 import { ProductsPage } from './pages/ProductsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { LoginPage } from './pages/LoginPage';
-import { ClientPortalPage } from './pages/ClientPortalPage';
 import { ProposalsPage } from './pages/ProposalsPage';
 import { TicketsPage } from './pages/TicketsPage';
 
@@ -30,9 +28,8 @@ export default function App() {
           <DataProvider>
             <BrowserRouter>
               <Routes>
-                {/* Public Authentication & Portal Routes */}
+                {/* Public Authentication */}
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="/portal/:clientId" element={<ClientPortalPage />} />
 
                 {/* Protected Application Routes */}
                 <Route
@@ -49,7 +46,6 @@ export default function App() {
                   <Route path="clients/:id" element={<ClientDetailPage />} />
                   <Route path="subscriptions" element={<SubscriptionsPage />} />
                   <Route path="payments" element={<PaymentsPage />} />
-                  <Route path="renewals" element={<RenewalsPage />} />
                   <Route path="proposals" element={<ProposalsPage />} />
                   <Route path="tickets" element={<TicketsPage />} />
                   <Route path="products" element={<ProductsPage />} />

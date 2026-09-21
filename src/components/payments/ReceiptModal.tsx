@@ -1,9 +1,11 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Modal } from '../common/Modal';
 import { Payment } from '../../types';
 import { useData } from '../../contexts/DataContext';
 import { formatCurrency, formatDateDisplay } from '../../lib/dateUtils';
 import { Printer, Download, CheckCircle } from 'lucide-react';
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 
 interface ReceiptModalProps {
   isOpen: boolean;
@@ -14,6 +16,7 @@ interface ReceiptModalProps {
 export const ReceiptModal: React.FC<ReceiptModalProps> = ({ isOpen, onClose, payment }) => {
   const { settings } = useData();
   const receiptRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   if (!payment) return null;
 
@@ -21,9 +24,25 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ isOpen, onClose, pay
     window.print();
   };
 
-  const handleDownload = () => {
-    // Generate clean text-based receipt or trigger printable save
-    window.print();
+  const handleDownload = async () => {
+    if (!receiptRef.current) return;
+    try {
+      setIsDownloading(true);
+      const element = receiptRef.current;
+      const options = {
+        margin: 10,
+        filename: `Receipt_${payment.receipt_number}.pdf`,
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const },
+      };
+      await html2pdf().set(options).from(element).save();
+    } catch (err) {
+      console.warn('PDF Receipt Export fallback:', err);
+      window.print();
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -191,11 +210,12 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ isOpen, onClose, pay
           </button>
           <button
             type="button"
+            disabled={isDownloading}
             onClick={handleDownload}
-            className="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50"
           >
             <Download className="w-4 h-4" />
-            Download
+            {isDownloading ? 'Generating PDF...' : 'Download PDF'}
           </button>
           <button
             type="button"

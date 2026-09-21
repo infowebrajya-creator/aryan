@@ -18,7 +18,7 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({ isOpen, onClose, p
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
-  const [title, setTitle] = useState('WebRajya Software Suite & Services Proposal');
+  const [title, setTitle] = useState('Official Software Quotation & Cost Estimate');
   const [validUntil, setValidUntil] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() + 15);
@@ -28,8 +28,9 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({ isOpen, onClose, p
     { id: '1', description: 'WebRajya Software License (12 Months)', quantity: 1, unit_price: 12000, total: 12000 },
     { id: '2', description: 'Initial Setup & Training Package', quantity: 1, unit_price: 3000, total: 3000 },
   ]);
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [includeGst, setIncludeGst] = useState(true);
-  const [notes, setNotes] = useState('Includes 12 months technical support, free updates, and cloud setup.');
+  const [notes, setNotes] = useState('Payment Terms: 50% advance upon quotation acceptance, 50% upon deployment.\nBank UPI / NEFT: webrajya@upi / ICICI Bank 000105001234');
 
   useEffect(() => {
     if (proposalToEdit) {
@@ -37,7 +38,7 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({ isOpen, onClose, p
       setClientName(proposalToEdit.client_name);
       setClientEmail(proposalToEdit.client_email || '');
       setClientPhone(proposalToEdit.client_phone || '');
-      setTitle(proposalToEdit.title);
+      setTitle(proposalToEdit.title || 'Official Software Quotation & Cost Estimate');
       setValidUntil(proposalToEdit.valid_until);
       setItems(proposalToEdit.items || []);
       setNotes(proposalToEdit.notes || '');
@@ -46,7 +47,8 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({ isOpen, onClose, p
       setClientName('');
       setClientEmail('');
       setClientPhone('');
-      setTitle('WebRajya Software Suite & Services Proposal');
+      setTitle('Official Software Quotation & Cost Estimate');
+      setDiscountAmount(0);
       setItems([
         { id: '1', description: 'WebRajya Software License (12 Months)', quantity: 1, unit_price: 12000, total: 12000 },
         { id: '2', description: 'Initial Setup & Training Package', quantity: 1, unit_price: 3000, total: 3000 },
@@ -98,7 +100,8 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({ isOpen, onClose, p
     setItems((prev) => prev.filter((i) => i.id !== id));
   };
 
-  const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+  const rawSubtotal = items.reduce((sum, item) => sum + item.total, 0);
+  const subtotal = Math.max(0, rawSubtotal - (discountAmount || 0));
   const taxAmount = includeGst ? Math.round(subtotal * 0.18) : 0;
   const totalAmount = subtotal + taxAmount;
 
@@ -146,16 +149,16 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({ isOpen, onClose, p
     const element = document.getElementById('proposal-pdf-preview');
     if (!element) return;
     try {
-      element.classList.remove('hidden');
       const opt = {
         margin: 10,
-        filename: `Proposal_${clientName.replace(/\s+/g, '_')}.pdf`,
+        filename: `Proposal_${clientName.replace(/\s+/g, '_') || 'Quotation'}.pdf`,
         image: { type: 'jpeg' as const, quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
         jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const },
       };
       await html2pdf().set(opt).from(element).save();
     } catch (e) {
+      console.warn('PDF Export fallback:', e);
       window.print();
     }
   };
@@ -327,7 +330,7 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({ isOpen, onClose, p
 
           {/* Pricing Summary */}
           <div className="flex flex-col sm:flex-row items-start justify-between gap-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
-            <div className="space-y-2 max-w-sm">
+            <div className="space-y-3 max-w-sm w-full">
               <label className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
                 <input
                   type="checkbox"
@@ -337,18 +340,48 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({ isOpen, onClose, p
                 />
                 Apply 18% GST Tax Breakdown
               </label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Payment terms, delivery timeline..."
-                rows={2}
-                className="w-full p-2 text-xs border border-slate-200 rounded bg-white"
-              />
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                  Special Discount (₹)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={discountAmount}
+                  onChange={(e) => setDiscountAmount(Number(e.target.value))}
+                  placeholder="0"
+                  className="w-full px-3 py-1.5 border border-slate-200 rounded text-xs font-mono bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                  Payment Terms & Bank Details
+                </label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Payment terms, bank details..."
+                  rows={2}
+                  className="w-full p-2 text-xs border border-slate-200 rounded bg-white"
+                />
+              </div>
             </div>
 
             <div className="space-y-1 text-xs text-right font-mono w-full sm:w-64">
               <div className="flex justify-between py-1 border-b border-slate-200">
-                <span className="text-slate-500 font-sans">Subtotal:</span>
+                <span className="text-slate-500 font-sans">Gross Total:</span>
+                <span className="font-bold text-slate-800">{formatCurrency(rawSubtotal)}</span>
+              </div>
+              {discountAmount > 0 && (
+                <div className="flex justify-between py-1 border-b border-slate-200 text-emerald-600">
+                  <span className="font-sans">Discount:</span>
+                  <span>-{formatCurrency(discountAmount)}</span>
+                </div>
+              )}
+              <div className="flex justify-between py-1 border-b border-slate-200">
+                <span className="text-slate-500 font-sans">Net Subtotal:</span>
                 <span className="font-bold text-slate-800">{formatCurrency(subtotal)}</span>
               </div>
               {includeGst && (
@@ -364,8 +397,8 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({ isOpen, onClose, p
             </div>
           </div>
 
-          {/* PDF Visual Template (Hidden render target) */}
-          <div className="hidden">
+          {/* PDF Visual Template (Off-screen render target) */}
+          <div className="fixed -left-[9999px] top-0 w-[800px] pointer-events-none opacity-0">
             <div id="proposal-pdf-preview" className="p-8 bg-white font-sans text-slate-900 space-y-6">
               <div className="flex justify-between border-b-2 border-indigo-600 pb-4">
                 <div>
@@ -374,14 +407,14 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({ isOpen, onClose, p
                   <p className="text-xs text-slate-500">Phone: {settings.phone} | GSTIN: {settings.gstin}</p>
                 </div>
                 <div className="text-right">
-                  <h2 className="text-xl font-bold uppercase tracking-wide text-slate-800">SOFTWARE PROPOSAL</h2>
+                  <h2 className="text-xl font-bold uppercase tracking-wide text-slate-800">OFFICIAL QUOTATION</h2>
                   <p className="text-xs font-mono">Date: {getTodayISO()}</p>
                   <p className="text-xs font-mono">Valid Until: {validUntil}</p>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">PREPARED FOR</h3>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">QUOTATION PREPARED FOR</h3>
                 <p className="text-base font-bold text-slate-900">{clientName}</p>
                 {clientPhone && <p className="text-xs text-slate-600">Phone: {clientPhone}</p>}
                 {clientEmail && <p className="text-xs text-slate-600">Email: {clientEmail}</p>}
@@ -391,7 +424,7 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({ isOpen, onClose, p
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-100 text-slate-700 font-bold">
                     <tr>
-                      <th className="p-2.5">Item Description</th>
+                      <th className="p-2.5">Item Description / Software Module</th>
                       <th className="p-2.5 text-center">Qty</th>
                       <th className="p-2.5 text-right">Price</th>
                       <th className="p-2.5 text-right">Total</th>
@@ -412,10 +445,20 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({ isOpen, onClose, p
 
               <div className="flex justify-between items-start pt-4 border-t border-slate-200">
                 <div className="max-w-xs text-xs text-slate-500 space-y-1">
-                  <p className="font-bold text-slate-700">Terms & Conditions:</p>
-                  <p>{notes}</p>
+                  <p className="font-bold text-slate-700">Payment Terms & Bank Details:</p>
+                  <p className="whitespace-pre-line">{notes}</p>
                 </div>
                 <div className="w-64 space-y-1.5 text-xs font-mono text-right">
+                  <div className="flex justify-between">
+                    <span>Gross Total:</span>
+                    <span>{formatCurrency(rawSubtotal)}</span>
+                  </div>
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-emerald-600">
+                      <span>Discount:</span>
+                      <span>-{formatCurrency(discountAmount)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span>Subtotal:</span>
                     <span>{formatCurrency(subtotal)}</span>
@@ -427,7 +470,7 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({ isOpen, onClose, p
                     </div>
                   )}
                   <div className="flex justify-between text-sm font-bold text-indigo-700 border-t pt-1">
-                    <span>Total:</span>
+                    <span>Grand Total:</span>
                     <span>{formatCurrency(totalAmount)}</span>
                   </div>
                 </div>

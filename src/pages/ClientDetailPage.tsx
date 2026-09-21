@@ -6,21 +6,15 @@ import {
   Mail,
   MapPin,
   FileText,
-  Calendar,
   CreditCard,
   Receipt,
   Plus,
   ArrowLeft,
   Edit2,
-  RefreshCw,
   Clock,
   Printer,
   MessageCircle,
-  Share2,
-  Check,
-  Copy,
   PieChart,
-  HeartPulse,
   Upload,
   Trash2,
   Download,
@@ -44,9 +38,7 @@ export const ClientDetailPage: React.FC = () => {
   const {
     getClientById,
     events,
-    cancelSubscription,
     sendReminder,
-    getClientHealthScore,
     clientDocuments,
     deleteClientDocument,
   } = useData();
@@ -62,7 +54,6 @@ export const ClientDetailPage: React.FC = () => {
   const [paymentSubId, setPaymentSubId] = useState<string | undefined>(undefined);
   const [renewSub, setRenewSub] = useState<Subscription | null>(null);
   const [viewReceipt, setViewReceipt] = useState<Payment | null>(null);
-  const [portalCopied, setPortalCopied] = useState(false);
 
   if (!client) {
     return (
@@ -86,14 +77,6 @@ export const ClientDetailPage: React.FC = () => {
 
   const clientSubscriptions: Subscription[] = client.subscriptions || [];
   const clientPayments: Payment[] = client.payments || [];
-
-  const handleCopyPortalLink = () => {
-    const portalUrl = `${window.location.origin}/portal/${client.id}`;
-    navigator.clipboard.writeText(portalUrl);
-    setPortalCopied(true);
-    addToast('Client self-service portal link copied to clipboard!', 'success');
-    setTimeout(() => setPortalCopied(false), 2500);
-  };
 
   const handleSendReminder = async (sub: Subscription) => {
     if (!client.phone) {
@@ -119,17 +102,6 @@ export const ClientDetailPage: React.FC = () => {
         </button>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleCopyPortalLink}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-2xs transition-colors border ${
-              portalCopied
-                ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                : 'bg-white border-slate-300 hover:bg-slate-50 text-slate-700'
-            }`}
-          >
-            {portalCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5 text-indigo-600" />}
-            <span>{portalCopied ? 'Portal Link Copied!' : 'Share Portal Link'}</span>
-          </button>
           <button
             onClick={() => setIsEditClientOpen(true)}
             className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold shadow-2xs transition-colors"
@@ -170,24 +142,6 @@ export const ClientDetailPage: React.FC = () => {
                   {client.business_name}
                 </h1>
                 <StatusBadge status={client.status} size="sm" />
-                {(() => {
-                  const health = getClientHealthScore(client.id);
-                  return (
-                    <span
-                      title={health.reasons.join(' • ')}
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border cursor-help ${
-                        health.level === 'HEALTHY'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          : health.level === 'WARNING'
-                          ? 'bg-amber-50 text-amber-700 border-amber-200'
-                          : 'bg-rose-50 text-rose-700 border-rose-200 animate-pulse'
-                      }`}
-                    >
-                      <HeartPulse className="w-3.5 h-3.5" />
-                      <span>{health.score}/100 {health.level === 'HEALTHY' ? 'Healthy' : health.level === 'WARNING' ? 'Warning' : 'High Risk'}</span>
-                    </span>
-                  );
-                })()}
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
                 Primary Contact: <strong className="text-slate-800">{client.owner_name}</strong>

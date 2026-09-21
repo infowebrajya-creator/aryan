@@ -30,13 +30,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
   const navItems = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/clients', label: 'Clients', icon: Users },
-    { to: '/subscriptions', label: 'Subscriptions', icon: CreditCard },
-    { to: '/payments', label: 'Payments', icon: Receipt },
-    { to: '/renewals', label: 'Renewals', icon: RefreshCw },
-    { to: '/proposals', label: 'Proposals', icon: FileText },
-    { to: '/tickets', label: 'Support Desk', icon: Headphones },
+    { to: '/subscriptions', label: 'Licenses & Renewals', icon: CreditCard },
+    { to: '/payments', label: 'Payments & Receipts', icon: Receipt },
+    { to: '/proposals', label: 'Quotations', icon: FileText },
+    { to: '/tickets', label: 'Support Tickets', icon: Headphones },
     { to: '/products', label: 'Products & Plans', icon: Package },
-    { to: '/reports', label: 'Reports', icon: BarChart3 },
+    { to: '/reports', label: 'Reports & Analytics', icon: BarChart3 },
     { to: '/settings', label: 'Settings', icon: Settings },
   ];
 
@@ -96,27 +95,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
         })}
       </nav>
 
-      {/* Role Switcher & User Profile Footer */}
+      {/* User Profile Footer */}
       <div className="p-3 border-t border-[#E7E9EE] bg-[#F7F8FA] space-y-2.5">
         {/* Role Badge */}
         <div className="px-3 py-2 rounded-xl bg-white border border-[#E7E9EE] text-[11px] flex items-center justify-between">
           <span className="text-[#687080] flex items-center gap-1.5 font-medium">
-            {isAdmin ? (
-              <ShieldCheck className="w-3.5 h-3.5 text-[#18A86B]" />
-            ) : (
-              <UserCheck className="w-3.5 h-3.5 text-[#5B5CE2]" />
-            )}
-            Role: <strong className="text-[#171A21] uppercase font-bold">{role}</strong>
+            <ShieldCheck className="w-3.5 h-3.5 text-[#18A86B]" />
+            Control Center: <strong className="text-[#171A21] uppercase font-bold">ADMIN</strong>
           </span>
-          {!import.meta.env.PROD && !getSupabaseConfig().isConfigured && (
-            <button
-              onClick={() => switchRole(isAdmin ? 'STAFF' : 'ADMIN')}
-              title="Toggle role in development environment"
-              className="text-[10px] text-[#5B5CE2] hover:underline font-semibold"
-            >
-              Switch
-            </button>
-          )}
         </div>
 
         {/* User Card */}

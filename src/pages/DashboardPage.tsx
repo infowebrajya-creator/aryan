@@ -6,6 +6,7 @@ import {
   Receipt,
   ArrowUpRight,
   MessageCircle,
+  FileText,
 } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 import { formatCurrency, formatDateDisplay, getDaysRemaining } from '../lib/dateUtils';
@@ -14,6 +15,7 @@ import { ClientFormModal } from '../components/clients/ClientFormModal';
 import { PaymentFormModal } from '../components/payments/PaymentFormModal';
 import { RenewSubscriptionModal } from '../components/subscriptions/RenewSubscriptionModal';
 import { ReceiptModal } from '../components/payments/ReceiptModal';
+import { ProposalModal } from '../components/proposals/ProposalModal';
 import { Subscription, Payment, Client } from '../types';
 
 export const DashboardPage: React.FC = () => {
@@ -24,6 +26,7 @@ export const DashboardPage: React.FC = () => {
   const [isNewClientOpen, setIsNewClientOpen] = useState(false);
   const [isNewSubOpen, setIsNewSubOpen] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [isProposalOpen, setIsProposalOpen] = useState(false);
   const [renewSub, setRenewSub] = useState<Subscription | null>(null);
   const [viewPayment, setViewPayment] = useState<Payment | null>(null);
 
@@ -81,7 +84,14 @@ export const DashboardPage: React.FC = () => {
           <p className="text-xs text-[#687080] mt-0.5">{currentDateFormatted}</p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => setIsProposalOpen(true)}
+            className="btn-secondary px-3.5 py-2 text-xs inline-flex items-center gap-1.5"
+          >
+            <FileText className="w-3.5 h-3.5 text-indigo-600" />
+            <span>+ Create Quotation</span>
+          </button>
           <button
             id="dash-add-client-btn"
             onClick={() => setIsNewClientOpen(true)}
@@ -281,6 +291,10 @@ export const DashboardPage: React.FC = () => {
         isOpen={Boolean(viewPayment)}
         onClose={() => setViewPayment(null)}
         payment={viewPayment}
+      />
+      <ProposalModal
+        isOpen={isProposalOpen}
+        onClose={() => setIsProposalOpen(false)}
       />
     </div>
   );
